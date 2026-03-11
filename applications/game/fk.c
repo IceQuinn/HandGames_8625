@@ -226,6 +226,7 @@ struct Game_Window_Str
     // 当前方块
 
     // 下一个方块
+    struct Cube_Str Next_Cube;
 
     // 游戏信息
     
@@ -240,6 +241,7 @@ struct Tetris_Window_Str
 
 
 struct Tetris_Window_Str Tetris_W = {
+    // 游戏窗口
     .Game_W.Size.x = 1,         // 留出1像素边框
     .Game_W.Size.y = 9,        // 留出10像素顶部空间显示分数等信息
     .Game_W.Size.width = 100,   
@@ -297,6 +299,17 @@ void DrawCurrent(int color)
             {
                 // 坐标单位为像素，转换为格子坐标后绘制
                 DrawBlock(C_Cube.x + j*BLOCK_SIZE, C_Cube.y + i*BLOCK_SIZE, color);
+            }
+        }
+    }
+
+    // 绘制下一个方块
+    for(int i=0;i<4;i++) {
+        for(int j=0;j<4;j++) {
+            if(blocks[Tetris_W.Game_W.Next_Cube.type][Tetris_W.Game_W.Next_Cube.rot][i][j])
+            {
+                // 显示在窗口右侧
+                DrawBlock(Tetris_W.Game_W.Next_Cube.x + j*BLOCK_SIZE, Tetris_W.Game_W.Next_Cube.y + i*BLOCK_SIZE, color);
             }
         }
     }
@@ -416,20 +429,33 @@ void ClearLines()
     }
 }
 
-// 160*160像素
-// 窗口大小为
-
-void NewBlock()
+// 初始化方块
+void Block_Init()
 {
-    // C_Cube.type = rand()%7;
-    // C_Cube.rot = 0;
-    // C_Cube.x = 2 * BLOCK_SIZE;  // 转换为像素单位
-    // C_Cube.y = 0;
-
     C_Cube.type = rand()%7;
     C_Cube.rot  = 0;
+    C_Cube.x    = 2 * BLOCK_SIZE;  // 转换为像素单位
+    C_Cube.y    = 0;
+
+    Tetris_W.Game_W.Next_Cube.type = rand()%7;
+    Tetris_W.Game_W.Next_Cube.rot  = 0;
+    Tetris_W.Game_W.Next_Cube.x    = 6 * BLOCK_SIZE; // 显示在窗口右侧
+    Tetris_W.Game_W.Next_Cube.y    = 0;
+}
+
+
+// 传递方块，生成新方块
+void NewBlock()
+{
+    C_Cube.type = Tetris_W.Game_W.Next_Cube.type;
+    C_Cube.rot  = Tetris_W.Game_W.Next_Cube.rot;
     C_Cube.x    = 2 * BLOCK_SIZE;
     C_Cube.y    = 0;
+
+    Tetris_W.Game_W.Next_Cube.type = rand()%7;
+    Tetris_W.Game_W.Next_Cube.rot  = 0;
+    Tetris_W.Game_W.Next_Cube.x    = 6 * BLOCK_SIZE; // 显示在窗口右侧
+    Tetris_W.Game_W.Next_Cube.y    = 0;
 }
 
 
@@ -437,9 +463,6 @@ void TetrisTask()
 {
     // 先擦除当前方块,将带颜色的方块擦除掉
     DrawCurrent(0);
-
-    // 累积下落像素，每10个像素下落一格
-
         
     // 方块下落时，的碰撞检测（下落一格）
     if(!CheckCollision(C_Cube.x, C_Cube.y+BLOCK_SIZE, C_Cube.rot))
@@ -474,7 +497,7 @@ void TetrisTask()
 void TetrisInit()
 {
     memset(map, 0, sizeof(map));
-    NewBlock();
+    Block_Init();
 }
 
 
