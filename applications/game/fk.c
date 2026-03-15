@@ -217,6 +217,7 @@ struct Cube_Str
 
 struct Cube_Str C_Cube; // 当前方块
 
+
 // 游戏窗口
 struct Game_Window_Str
 {
@@ -226,10 +227,16 @@ struct Game_Window_Str
     // 当前方块
 
     // 下一个方块
-    struct Cube_Str Next_Cube;
+    struct Cube_Str Next_Cube; 
+};
 
-    // 游戏信息
-    
+struct Text_Window_Str
+{
+    // 文本窗口
+    struct Size_Str Size; // 窗口大小控制
+    // 显示文本内容
+    uint16_t Score; // 当前分数
+    char Text[100]; // 用于显示分数等信息
 };
 
 struct Tetris_Window_Str
@@ -237,6 +244,7 @@ struct Tetris_Window_Str
     // 游戏窗口
     struct Game_Window_Str  Game_W; // 游戏窗口信息
     // 文本窗口
+    struct Text_Window_Str  Text_W; // 文本窗口信息
 };
 
 
@@ -246,6 +254,13 @@ struct Tetris_Window_Str Tetris_W = {
     .Game_W.Size.y = 9,        // 留出10像素顶部空间显示分数等信息
     .Game_W.Size.width = 100,   
     .Game_W.Size.height = 150,
+    // 文本窗口
+    .Text_W.Size.x = 13,
+    .Text_W.Size.y = 9,
+    .Text_W.Size.width = 55,
+    .Text_W.Size.height = 150,
+    .Text_W.Score = 0,
+    .Text_W.Text = "分数:",
 };
 
 
@@ -255,6 +270,19 @@ void Tetris_Draw_Point(int x, int y, int color)
     uint16_t basic_y = Tetris_W.Game_W.Size.y;
     GuiDrawPoint(basic_x + x, basic_y + y, color);
 }
+
+// 绘制一个BLOCK_SIZE * BLOCK_SIZE方块
+void DrawBlock_2(int x, int y, uint16_t block_size, int color)
+{
+    for(int i=0;i<block_size;i++)
+    {
+        for(int j=0;j<block_size;j++)
+        {
+            Tetris_Draw_Point(x+j,y+i,color);
+        }
+    }
+}
+
 
 // 绘制一个BLOCK_SIZE * BLOCK_SIZE方块
 void DrawBlock(int x, int y, int color)
@@ -309,7 +337,7 @@ void DrawCurrent(int color)
             if(blocks[Tetris_W.Game_W.Next_Cube.type][Tetris_W.Game_W.Next_Cube.rot][i][j])
             {
                 // 显示在窗口右侧
-                DrawBlock(Tetris_W.Game_W.Next_Cube.x + j*BLOCK_SIZE, Tetris_W.Game_W.Next_Cube.y + i*BLOCK_SIZE, color);
+                DrawBlock_2(Tetris_W.Game_W.Next_Cube.x + j*BLOCK_SIZE/2, Tetris_W.Game_W.Next_Cube.y + i*BLOCK_SIZE/2, BLOCK_SIZE/2, color);
             }
         }
     }
@@ -439,8 +467,8 @@ void Block_Init()
 
     Tetris_W.Game_W.Next_Cube.type = rand()%7;
     Tetris_W.Game_W.Next_Cube.rot  = 0;
-    Tetris_W.Game_W.Next_Cube.x    = 6 * BLOCK_SIZE; // 显示在窗口右侧
-    Tetris_W.Game_W.Next_Cube.y    = 0;
+    Tetris_W.Game_W.Next_Cube.x    = 7 * BLOCK_SIZE; // 显示在窗口右侧
+    Tetris_W.Game_W.Next_Cube.y    = 5;
 }
 
 
@@ -454,8 +482,8 @@ void NewBlock()
 
     Tetris_W.Game_W.Next_Cube.type = rand()%7;
     Tetris_W.Game_W.Next_Cube.rot  = 0;
-    Tetris_W.Game_W.Next_Cube.x    = 6 * BLOCK_SIZE; // 显示在窗口右侧
-    Tetris_W.Game_W.Next_Cube.y    = 0;
+    Tetris_W.Game_W.Next_Cube.x    = 7 * BLOCK_SIZE; // 显示在窗口右侧
+    Tetris_W.Game_W.Next_Cube.y    = 5;
 }
 
 
@@ -575,21 +603,6 @@ void DropFast(void)
 
 
 
-//void button_entry()
-//{
-//    if(KEY_LEFT)  MoveLeft();
-//
-//    if(KEY_RIGHT) MoveRight();
-//
-//    if(KEY_UP)    Rotate();
-//
-//    if(KEY_DOWN)  MoveDown();
-//
-//    if(KEY_OK)    DropFast();
-//}
-
-
-
 void thread_fk(void)
 {
     TetrisInit();
@@ -597,7 +610,7 @@ void thread_fk(void)
     {
         TetrisTask();
         GuiUpdateDisplayAll();
-        rt_thread_mdelay(400);
+        rt_thread_mdelay(500);
     }
 
 }
