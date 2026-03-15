@@ -22,6 +22,8 @@
 #include "button.h"
 #include "fk.h"
 
+#include "draw_gui_font.h"
+
 
 #define countof(x)      (sizeof(x)/sizeof(x[0]))
 
@@ -100,6 +102,10 @@ int main(void)
 
     GuiHPointLine(0, 8, 159, 1, 1);
     GuiRPointLine(101, 0, 159, 1, 1);
+
+    defaultFontInit();
+
+    GuiRowText(130, 20, 32, FONT_LEFT, "²Ëµ¥");
 
 
     GuiUpdateDisplayAll();

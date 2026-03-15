@@ -1,0 +1,64 @@
+
+
+
+
+#include "GuiColour.h"
+
+
+
+
+/* 定义前景色/背景色 */
+static uint16_t forecolor = 1;
+static uint16_t backcolor = 0;
+
+/**
+  *@brief 获取前景色
+  *@param  None
+  *@retval 返回前景色
+  */
+uint16_t GuiGetForecolor(void)
+{
+	return forecolor;
+}
+
+/**
+  *@brief 设置前景色
+  *@param  colour 前景色
+  *@retval None
+  */
+void GuiSetForecolor(uint16_t colour)
+{
+	forecolor = colour;
+}
+
+/**
+  *@brief 获取背景色
+  *@param  None
+  *@retval 返回背景色
+  */
+uint16_t GuiGetbackcolor(void)
+{
+	return backcolor;
+}
+/**
+  *@brief 设置背景色
+  *@param  colour 背景色
+  *@retval None
+  */
+void GuiSetbackcolor(uint16_t colour)
+{
+	backcolor = colour;
+}
+
+/**
+  *@brief 交换前景色和背景色
+  *@param  None
+  *@retval None
+  */
+void GuiExchangeColor(void)
+{
+	uint16_t tColour;
+	tColour = forecolor;
+	forecolor = backcolor;
+	backcolor = tColour;
+}
