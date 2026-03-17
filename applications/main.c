@@ -23,6 +23,7 @@
 #include "fk.h"
 
 #include "draw_gui_font.h"
+#include "ui.h"
 
 
 #define countof(x)      (sizeof(x)/sizeof(x[0]))
@@ -45,7 +46,7 @@ const user_thread_table_typedef user_thread_table[] = {
 //        {"record",      Record_Wave_Thread, RT_NULL,    1024,   6,  15},    /* 录波线程 */
 //        {"event",       Event_Deal_Loop,    RT_NULL,    1024,   30, 10},    /* 事件记录线程 */
 //        {"btn",         btn_thread_entry,   RT_NULL,    768,    9,  10},    /* 按键线程 */
-//        {"ui",          ui_loop,            RT_NULL,    2048,   26, 10},    /* 显示线程 */
+       {"ui",          ui_thread,            RT_NULL,    2048,   26, 10},    /* 显示线程 */
 
 //        {"relay",       relay_thread_entry, RT_NULL,    768,    8, 10},    /* 保护+交流量计算线程 */
 //        {"md_send",     send_thread_entry,  RT_NULL,    1280,   29, 10},    /* 转存数据线程 */

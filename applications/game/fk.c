@@ -211,8 +211,8 @@ struct Cube_Str
 {
     uint16_t type;   // 方块类型 0-6
     uint16_t rot;    // 旋转状态 0-3
-    uint16_t x;      // 方块左上角x坐标（像素单位）
-    uint16_t y;      // 方块左上角y坐标（像素单位）
+    int16_t x;      // 方块左上角x坐标（像素单位）
+    int16_t y;      // 方块左上角y坐标（像素单位）
 };
 
 struct Cube_Str C_Cube; // 当前方块
@@ -225,6 +225,7 @@ struct Game_Window_Str
     struct Size_Str Size; // 窗口大小控制
 
     // 当前方块
+    struct Cube_Str Curr_Cube;
 
     // 下一个方块
     struct Cube_Str Next_Cube; 
@@ -251,7 +252,7 @@ struct Tetris_Window_Str
 struct Tetris_Window_Str Tetris_W = {
     // 游戏窗口
     .Game_W.Size.x = 1,         // 留出1像素边框
-    .Game_W.Size.y = 9,        // 留出10像素顶部空间显示分数等信息
+    .Game_W.Size.y = 9,        // 留出9像素顶部空间显示其他信息
     .Game_W.Size.width = 100,   
     .Game_W.Size.height = 150,
     // 文本窗口
@@ -371,12 +372,14 @@ int CheckCollision(int nx,int ny,int rot)
                 int y = (ny + i*BLOCK_SIZE);
 
                 // 左边界判断
-                if(x<0)
+                if(x<0){
                     return 1;
+                }
 
                 // 右边界判断
-                if((x + BLOCK_SIZE) > 10*BLOCK_SIZE)
+                if((x + BLOCK_SIZE) > 10*BLOCK_SIZE){
                     return 1;
+                }
 
                 // 下边界判断
                 if((y) >= 16*BLOCK_SIZE)
@@ -385,8 +388,9 @@ int CheckCollision(int nx,int ny,int rot)
                 // 和地图上的点检查碰撞
                 for (size_t block_i = 0; block_i < BLOCK_SIZE; block_i++)
                 {
-                    if(map[y][x + block_i])
+                    if(map[y][x + block_i]){
                         return 1;
+                    }
                 }
             }
         }
@@ -486,34 +490,118 @@ void NewBlock()
     Tetris_W.Game_W.Next_Cube.y    = 5;
 }
 
-
-void TetrisTask()
+union Tetris_e_flg_UNION
 {
-    // 先擦除当前方块,将带颜色的方块擦除掉
-    DrawCurrent(0);
-        
-    // 方块下落时，的碰撞检测（下落一格）
-    if(!CheckCollision(C_Cube.x, C_Cube.y+BLOCK_SIZE, C_Cube.rot))
-    {
-        C_Cube.y += BLOCK_SIZE;
+    uint32_t Tetris_e_flg;
+    struct {
+        uint32_t Tetris_move_left       :1;     // 左移
+        uint32_t Tetris_move_right      :1;     // 右移
+        uint32_t Tetris_ratate          :1;     // 变换
+        uint32_t Tetris_drop_fast       :1;     // 下落
+        uint32_t Tetris_timeout         :1;     // 超时
+    };
+};
+
+
+void TetrisTask(union Tetris_e_flg_UNION *flag)
+{
+    // 左移
+    if(flag->Tetris_move_left){
+        DrawCurrent(0);   // 擦除当前方块
+
+        // 左移10像素（一个格子宽度）
+        if(!CheckCollision(C_Cube.x-BLOCK_SIZE, C_Cube.y, C_Cube.rot))
+        {
+
+            C_Cube.x -= BLOCK_SIZE;
+        }
+
+        DrawCurrent(1);   // 重新绘制
     }
-    else
-    {
+    // 右移
+    if(flag->Tetris_move_right){
+        DrawCurrent(0);
+
+        // 右移10像素（一个格子宽度）
+        if(!CheckCollision(C_Cube.x+BLOCK_SIZE, C_Cube.y, C_Cube.rot))
+        {
+            C_Cube.x += BLOCK_SIZE;
+        }
+
+        DrawCurrent(1);
+    }
+    // 变化
+    if(flag->Tetris_ratate){
+        int new_rot = (C_Cube.rot + 1) % 4;
+
+        DrawCurrent(0);
+
+        if(!CheckCollision(C_Cube.x, C_Cube.y, new_rot))
+        {
+            C_Cube.rot = new_rot;
+        }
+
+        DrawCurrent(1);
+    }
+
+    if(flag->Tetris_drop_fast){
+        DrawCurrent(0);
+
+        // 快速下落（以格子为单位）
+        while(!CheckCollision(C_Cube.x, C_Cube.y+BLOCK_SIZE, C_Cube.rot))
+        {
+            C_Cube.y += BLOCK_SIZE;
+        }
+
+        DrawCurrent(1);
+
         // 固定方块
         FixBlock();
+
+        // 消行
         ClearLines();
+
+        // 新方块
         NewBlock();
-        
+
         // 检查新方块是否能放置（游戏结束判定）
         if(CheckCollision(C_Cube.x, C_Cube.y, C_Cube.rot))
         {
             // 方块到顶，重新开始游戏
             TetrisInit();
         }
+
+        DrawMap();
+        DrawCurrent(1);
     }
 
-    DrawMap();
-    DrawCurrent(1);
+    if(flag->Tetris_timeout){
+        // 先擦除当前方块,将带颜色的方块擦除掉
+        DrawCurrent(0);
+
+        // 方块下落时，的碰撞检测（下落一格）
+        if(!CheckCollision(C_Cube.x, C_Cube.y+BLOCK_SIZE, C_Cube.rot))
+        {
+            C_Cube.y += BLOCK_SIZE;
+        }
+        else
+        {
+            // 固定方块
+            FixBlock();
+            ClearLines();
+            NewBlock();
+
+            // 检查新方块是否能放置（游戏结束判定）
+            if(CheckCollision(C_Cube.x, C_Cube.y, C_Cube.rot))
+            {
+                // 方块到顶，重新开始游戏
+                TetrisInit();
+            }
+        }
+
+        DrawMap();
+        DrawCurrent(1);
+    }
 }
 
 
@@ -528,89 +616,121 @@ void TetrisInit()
     Block_Init();
 }
 
+/* 事件控制块 */
+static struct rt_event Tetris_event;
+
+union Tetris_e_flg_UNION Tetris_e_flg;
+
+#define TETRIS_MOVE_LEFT    (1 << 0)
+#define TETRIS_MOVE_RIGHT   (1 << 1)
+#define TETRIS_ROTATE       (1 << 2)
+#define TETRIS_DROP_FAST    (1 << 3)
 
 
 void MoveLeft(void)
 {
-    DrawCurrent(0);   // 擦除当前方块
-
-    // 左移10像素（一个格子宽度）
-    if(!CheckCollision(C_Cube.x-BLOCK_SIZE, C_Cube.y, C_Cube.rot))
-    {
-        C_Cube.x -= BLOCK_SIZE;
-    }
-
-    DrawCurrent(1);   // 重新绘制
+    rt_event_send(&Tetris_event, TETRIS_MOVE_LEFT);
+//    DrawCurrent(0);   // 擦除当前方块
+//
+//    // 左移10像素（一个格子宽度）
+//    if(!CheckCollision(C_Cube.x-BLOCK_SIZE, C_Cube.y, C_Cube.rot))
+//    {
+//        C_Cube.x -= BLOCK_SIZE;
+//    }
+//
+//    DrawCurrent(1);   // 重新绘制
 }
 void MoveRight(void)
 {
-    DrawCurrent(0);
-
-    // 右移10像素（一个格子宽度）
-    if(!CheckCollision(C_Cube.x+BLOCK_SIZE, C_Cube.y, C_Cube.rot))
-    {
-        C_Cube.x += BLOCK_SIZE;
-    }
-
-    DrawCurrent(1);
+    rt_event_send(&Tetris_event, TETRIS_MOVE_RIGHT);
+//    DrawCurrent(0);
+//
+//    // 右移10像素（一个格子宽度）
+//    if(!CheckCollision(C_Cube.x+BLOCK_SIZE, C_Cube.y, C_Cube.rot))
+//    {
+//        C_Cube.x += BLOCK_SIZE;
+//    }
+//
+//    DrawCurrent(1);
 }
 
 void Rotate(void)
 {
-    int new_rot = (C_Cube.rot + 1) % 4;
-
-    DrawCurrent(0);
-
-    if(!CheckCollision(C_Cube.x, C_Cube.y, new_rot))
-    {
-        C_Cube.rot = new_rot;
-    }
-
-    DrawCurrent(1);
+    rt_event_send(&Tetris_event, TETRIS_ROTATE);
+//    int new_rot = (C_Cube.rot + 1) % 4;
+//
+//    DrawCurrent(0);
+//
+//    if(!CheckCollision(C_Cube.x, C_Cube.y, new_rot))
+//    {
+//        C_Cube.rot = new_rot;
+//    }
+//
+//    DrawCurrent(1);
 }
 
 void DropFast(void)
 {
-    DrawCurrent(0);
-
-    // 快速下落（以格子为单位）
-    while(!CheckCollision(C_Cube.x, C_Cube.y+BLOCK_SIZE, C_Cube.rot))
-    {
-        C_Cube.y += BLOCK_SIZE;
-    }
-
-    DrawCurrent(1);
-
-    // 固定方块
-    FixBlock();
-
-    // 消行
-    ClearLines();
-
-    // 新方块
-    NewBlock();
-
-    // 检查新方块是否能放置（游戏结束判定）
-    if(CheckCollision(C_Cube.x, C_Cube.y, C_Cube.rot))
-    {
-        // 方块到顶，重新开始游戏
-        TetrisInit();
-    }
-
-    DrawMap();
-    DrawCurrent(1);
+    rt_event_send(&Tetris_event, TETRIS_DROP_FAST);
+//    DrawCurrent(0);
+//
+//    // 快速下落（以格子为单位）
+//    while(!CheckCollision(C_Cube.x, C_Cube.y+BLOCK_SIZE, C_Cube.rot))
+//    {
+//        C_Cube.y += BLOCK_SIZE;
+//    }
+//
+//    DrawCurrent(1);
+//
+//    // 固定方块
+//    FixBlock();
+//
+//    // 消行
+//    ClearLines();
+//
+//    // 新方块
+//    NewBlock();
+//
+//    // 检查新方块是否能放置（游戏结束判定）
+//    if(CheckCollision(C_Cube.x, C_Cube.y, C_Cube.rot))
+//    {
+//        // 方块到顶，重新开始游戏
+//        TetrisInit();
+//    }
+//
+//    DrawMap();
+//    DrawCurrent(1);
 }
+
 
 
 
 void thread_fk(void)
 {
+    int32_t err_t = RT_EOK;
+    /* 初始化事件对象 */
+    if(RT_EOK != rt_event_init(&Tetris_event, "event", RT_IPC_FLAG_PRIO))
+    {
+        rt_kprintf("init event failed.\n");
+    }
+
     TetrisInit();
     while(1)
     {
-        TetrisTask();
-        GuiUpdateDisplayAll();
-        rt_thread_mdelay(500);
+        err_t = rt_event_recv(&Tetris_event,
+                (TETRIS_MOVE_LEFT|TETRIS_MOVE_RIGHT|TETRIS_ROTATE|TETRIS_DROP_FAST),
+                RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
+                500,
+                &Tetris_e_flg);
+
+        if(-RT_ETIMEOUT == err_t){
+            Tetris_e_flg.Tetris_timeout = 1;
+        }
+
+        TetrisTask(&Tetris_e_flg);
+        Tetris_e_flg.Tetris_e_flg = 0;
+        // GuiUpdateDisplayAll();
+//        rt_thread_mdelay(500);
     }
 
 }
