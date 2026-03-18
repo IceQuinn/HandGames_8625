@@ -106,7 +106,7 @@ int main(void)
 
     defaultFontInit();
 
-    GuiRowText(130, 20, 32, FONT_LEFT, "²Ëµ¥");
+//    GuiRowText(130, 20, 32, FONT_LEFT, "²Ëµ¥");
 
 
     GuiUpdateDisplayAll();
