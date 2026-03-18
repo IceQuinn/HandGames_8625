@@ -274,25 +274,13 @@ void Tetris_Draw_Point(int x, int y, int color)
     GuiDrawPoint(basic_x + x, basic_y + y, color);
 }
 
+
 // 绘制一个BLOCK_SIZE * BLOCK_SIZE方块
-void DrawBlock_2(int x, int y, uint16_t block_size, int color)
+void DrawBlock(int x, int y, uint16_t block_size, int color)
 {
     for(int i=0;i<block_size;i++)
     {
         for(int j=0;j<block_size;j++)
-        {
-            Tetris_Draw_Point(x+j,y+i,color);
-        }
-    }
-}
-
-
-// 绘制一个BLOCK_SIZE * BLOCK_SIZE方块
-void DrawBlock(int x, int y, int color)
-{
-    for(int i=0;i<BLOCK_SIZE;i++)
-    {
-        for(int j=0;j<BLOCK_SIZE;j++)
         {
             Tetris_Draw_Point(x+j,y+i,color);
         }
@@ -336,7 +324,7 @@ void DrawCurrent(int color, struct Game_Window_Str *p_Game_W)
             if(blocks[p_Game_W->Curr_Cube.type][p_Game_W->Curr_Cube.rot][i][j])
             {
                 // 坐标单位为像素，转换为格子坐标后绘制
-                DrawBlock(p_Game_W->Curr_Cube.x + j*BLOCK_SIZE, p_Game_W->Curr_Cube.y + i*BLOCK_SIZE, color);
+                DrawBlock(p_Game_W->Curr_Cube.x + j*BLOCK_SIZE, p_Game_W->Curr_Cube.y + i*BLOCK_SIZE, BLOCK_SIZE, color);
             }
         }
     }
@@ -347,7 +335,7 @@ void DrawCurrent(int color, struct Game_Window_Str *p_Game_W)
             if(blocks[p_Game_W->Next_Cube.type][p_Game_W->Next_Cube.rot][i][j])
             {
                 // 显示在窗口右侧
-                DrawBlock_2(p_Game_W->Next_Cube.x + j*BLOCK_SIZE/2, p_Game_W->Next_Cube.y + i*BLOCK_SIZE/2, BLOCK_SIZE/2, color);
+                DrawBlock(p_Game_W->Next_Cube.x + j*BLOCK_SIZE/2, p_Game_W->Next_Cube.y + i*BLOCK_SIZE/2, BLOCK_SIZE/2, color);
             }
         }
     }
@@ -474,6 +462,23 @@ uint16_t ClearLines(void)
     return ClearedLines;
 }
 
+
+void Init_Back_Point(void)
+{
+    Tetris_W.Game_W.Size.x;
+
+    for(uint16_t x=0; x<100; ){
+        for(uint16_t y=0; y<150; ){
+            if((0 != x) && (y != 0)){
+                GuiDrawPoint(Tetris_W.Game_W.Size.x + x, Tetris_W.Game_W.Size.y + y, 1);
+            }
+            y += BLOCK_SIZE; // 每隔一个方块高度绘制一个点
+        }
+        x += BLOCK_SIZE; // 每隔一个方块宽度绘制一个点
+    }
+
+}
+
 // 初始化方块
 void Block_Init()
 {
@@ -486,6 +491,8 @@ void Block_Init()
     Tetris_W.Game_W.Next_Cube.rot  = 0;
     Tetris_W.Game_W.Next_Cube.x    = 7 * BLOCK_SIZE; // 显示在窗口右侧
     Tetris_W.Game_W.Next_Cube.y    = 5;
+
+    Init_Back_Point();
 }
 
 
