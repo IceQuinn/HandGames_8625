@@ -16,6 +16,7 @@
 
 // 地图数组
 uint8_t map[150][100]; // 用于像素级碰撞检测
+uint8_t back_ground_map[150][100]; // 用于像素级碰撞检测
 
 
 // 方块
@@ -223,6 +224,9 @@ struct Cube_Str
 // 游戏窗口
 struct Game_Window_Str
 {
+    // 背景窗口
+    // struct Size_Str Background_Size;
+
     // 游戏窗口
     struct Size_Str Size; // 窗口大小控制
 
@@ -252,6 +256,11 @@ struct Tetris_Window_Str
 
 
 struct Tetris_Window_Str Tetris_W = {
+    // 背景窗口
+    // .Game_W.Background_Size.x = 1,         // 留出1像素边框
+    // .Game_W.Background_Size.y = 9,         // 留出9像素顶部空间显示其他信息
+    // .Game_W.Background_Size.width = 100,   
+    // .Game_W.Background_Size.height = 150,
     // 游戏窗口
     .Game_W.Size.x = 1,         // 留出1像素边框
     .Game_W.Size.y = 9,        // 留出9像素顶部空间显示其他信息
@@ -302,6 +311,15 @@ void DrawMap()
         for(int x=0;x<100;x++)
         {
             Tetris_Draw_Point(x,y,map[y][x]);
+        }
+    }
+    for(int y=0;y<150;y++)
+    {
+        for(int x=0;x<100;x++)
+        {
+            if(back_ground_map[y][x]){
+                Tetris_Draw_Point(x,y,back_ground_map[y][x]);
+            }
         }
     }
 
@@ -379,7 +397,7 @@ int CheckCollision(int16_t nx, int16_t ny, uint16_t type, uint16_t rot)
                 }
 
                 // 下边界判断
-                if((y) >= 16*BLOCK_SIZE)
+                if((y) >= 15*BLOCK_SIZE)
                     return 1;
 
                 // 和地图上的点检查碰撞
@@ -465,17 +483,18 @@ uint16_t ClearLines(void)
 
 void Init_Back_Point(void)
 {
-    Tetris_W.Game_W.Size.x;
-
     for(uint16_t x=0; x<100; ){
         for(uint16_t y=0; y<150; ){
             if((0 != x) && (y != 0)){
-                GuiDrawPoint(Tetris_W.Game_W.Size.x + x, Tetris_W.Game_W.Size.y + y, 1);
+                // GuiDrawPoint(Tetris_W.Game_W.Size.x + x, Tetris_W.Game_W.Size.y + y, 1);
+               back_ground_map[y][x] = 1; // 标记背景点
             }
             y += BLOCK_SIZE; // 每隔一个方块高度绘制一个点
         }
         x += BLOCK_SIZE; // 每隔一个方块宽度绘制一个点
     }
+
+    
 
 }
 
