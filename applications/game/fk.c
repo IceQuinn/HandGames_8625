@@ -225,7 +225,7 @@ struct Cube_Str
 struct Game_Window_Str
 {
     // 背景窗口
-    // struct Size_Str Background_Size;
+    struct Size_Str Background_Size;
 
     // 游戏窗口
     struct Size_Str Size; // 窗口大小控制
@@ -257,10 +257,10 @@ struct Tetris_Window_Str
 
 struct Tetris_Window_Str Tetris_W = {
     // 背景窗口
-    // .Game_W.Background_Size.x = 1,         // 留出1像素边框
-    // .Game_W.Background_Size.y = 9,         // 留出9像素顶部空间显示其他信息
-    // .Game_W.Background_Size.width = 100,   
-    // .Game_W.Background_Size.height = 150,
+    .Game_W.Background_Size.x = 1,         // 留出1像素边框
+    .Game_W.Background_Size.y = 9,         // 留出9像素顶部空间显示其他信息
+    .Game_W.Background_Size.width = 100,   
+    .Game_W.Background_Size.height = 150,
     // 游戏窗口
     .Game_W.Size.x = 1,         // 留出1像素边框
     .Game_W.Size.y = 9,        // 留出9像素顶部空间显示其他信息
@@ -299,8 +299,10 @@ void DrawBlock(int x, int y, uint16_t block_size, int color)
 void Draw_Text_Map()
 {
     char score_str[20];
-    sprintf(score_str, "分数:%d", Tetris_W.Text_W.Score);
-    GuiRowText(Tetris_W.Text_W.Size.x, Tetris_W.Text_W.Size.y, Tetris_W.Text_W.Size.width, FONT_LEFT, score_str);
+    sprintf(score_str, "%d", Tetris_W.Text_W.Score);
+    GuiRowText(Tetris_W.Text_W.Size.x, Tetris_W.Text_W.Size.y, Tetris_W.Text_W.Size.width, FONT_LEFT, Tetris_W.Text_W.Text);
+
+    GuiRowText(Tetris_W.Text_W.Size.x, Tetris_W.Text_W.Size.y + 16, Tetris_W.Text_W.Size.width, FONT_LEFT, score_str);
 }
 
 
@@ -547,53 +549,36 @@ void TetrisTask(union Tetris_e_flg_UNION *flag, struct Tetris_Window_Str *p_Tetr
 {
     // 左移
     if(flag->Tetris_move_left){
-        DrawCurrent(0, &p_Tetris_W->Game_W);   // 擦除当前方块
-
         // 左移10像素（一个格子宽度）
         if(!CheckCollision(p_Tetris_W->Game_W.Curr_Cube.x-BLOCK_SIZE, p_Tetris_W->Game_W.Curr_Cube.y, p_Tetris_W->Game_W.Curr_Cube.type, p_Tetris_W->Game_W.Curr_Cube.rot))
         {
-
             p_Tetris_W->Game_W.Curr_Cube.x -= BLOCK_SIZE;
         }
-
-        DrawCurrent(1, &p_Tetris_W->Game_W);   // 重新绘制
     }
     // 右移
     if(flag->Tetris_move_right){
-        DrawCurrent(0, &p_Tetris_W->Game_W);
-
         // 右移10像素（一个格子宽度）
         if(!CheckCollision(p_Tetris_W->Game_W.Curr_Cube.x+BLOCK_SIZE, p_Tetris_W->Game_W.Curr_Cube.y, p_Tetris_W->Game_W.Curr_Cube.type, p_Tetris_W->Game_W.Curr_Cube.rot))
         {
             p_Tetris_W->Game_W.Curr_Cube.x += BLOCK_SIZE;
         }
-
-        DrawCurrent(1, &p_Tetris_W->Game_W);
     }
     // 变化
     if(flag->Tetris_ratate){
         int new_rot = (p_Tetris_W->Game_W.Curr_Cube.rot + 1) % 4;
 
-        DrawCurrent(0, &p_Tetris_W->Game_W);
-
         if(!CheckCollision(p_Tetris_W->Game_W.Curr_Cube.x, p_Tetris_W->Game_W.Curr_Cube.y, p_Tetris_W->Game_W.Curr_Cube.type, new_rot))
         {
             p_Tetris_W->Game_W.Curr_Cube.rot = new_rot;
         }
-
-        DrawCurrent(1, &p_Tetris_W->Game_W);
     }
 
     if(flag->Tetris_drop_fast){
-        DrawCurrent(0, &p_Tetris_W->Game_W);
-
         // 快速下落（以格子为单位）
         while(!CheckCollision(p_Tetris_W->Game_W.Curr_Cube.x, p_Tetris_W->Game_W.Curr_Cube.y+BLOCK_SIZE, p_Tetris_W->Game_W.Curr_Cube.type, p_Tetris_W->Game_W.Curr_Cube.rot))
         {
             p_Tetris_W->Game_W.Curr_Cube.y += BLOCK_SIZE;
         }
-
-        DrawCurrent(1, &p_Tetris_W->Game_W);
 
         // 固定方块
         FixBlock(&p_Tetris_W->Game_W.Curr_Cube);
@@ -610,9 +595,6 @@ void TetrisTask(union Tetris_e_flg_UNION *flag, struct Tetris_Window_Str *p_Tetr
             // 方块到顶，重新开始游戏
             TetrisInit();
         }
-
-        DrawMap();
-        DrawCurrent(1, &p_Tetris_W->Game_W);
     }
     static uint32_t tick_timeout = 0;
     if(0 == tick_timeout){
@@ -625,9 +607,6 @@ void TetrisTask(union Tetris_e_flg_UNION *flag, struct Tetris_Window_Str *p_Tetr
         }
     }
     if(flag->Tetris_timeout){
-
-        // 先擦除当前方块,将带颜色的方块擦除掉
-        DrawCurrent(0, &p_Tetris_W->Game_W);
 
         // 方块下落时，的碰撞检测（下落一格）
         if(!CheckCollision(p_Tetris_W->Game_W.Curr_Cube.x, p_Tetris_W->Game_W.Curr_Cube.y+BLOCK_SIZE, p_Tetris_W->Game_W.Curr_Cube.type, p_Tetris_W->Game_W.Curr_Cube.rot))
@@ -650,10 +629,9 @@ void TetrisTask(union Tetris_e_flg_UNION *flag, struct Tetris_Window_Str *p_Tetr
                 p_Tetris_W->Text_W.Score = 0;
             }
         }
-
-        DrawMap();
-        DrawCurrent(1, &p_Tetris_W->Game_W);
     }
+    DrawMap();
+    DrawCurrent(1, &p_Tetris_W->Game_W);
 }
 
 
