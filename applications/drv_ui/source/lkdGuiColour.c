@@ -1,15 +1,16 @@
+/**
+  * @file   lkdGuiColour.c
+  * @author  guoweilkd
+  * @version V0.0.0
+  * @date    2018/04/18
+  * @brief  颜色管理 目前只有黑白
+  */
 
-
-
-
-#include "GuiColour.h"
-
-
-
+#include "lkdGui.h"
 
 /* 定义前景色/背景色 */
-static uint16_t forecolor = 1;
-static uint16_t backcolor = 0;
+static uint16_t forecolor = CBLACK;
+static uint16_t backcolor = CWHITLE;
 
 /**
   *@brief 获取前景色
@@ -62,3 +63,5 @@ void GuiExchangeColor(void)
 	forecolor = backcolor;
 	backcolor = tColour;
 }
+
+/* END */

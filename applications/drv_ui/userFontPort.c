@@ -6,9 +6,7 @@
   * @brief  lkdGui字体驱动接口，由移植者填充函数的具体内容。
   */
 
-// #include "include/lkdGui.h"
-#include "draw_gui_font.h"
-#include "GuiColour.h"
+#include "lkdGui.h"
 
 extern uint8_t GetFontASCII_8_16(uint8_t code1, uint8_t *pBuff);
 extern uint8_t GetFontGb2312_16_16(uint8_t, uint8_t, uint8_t*);
@@ -65,6 +63,6 @@ void defaultFontInit(void)
 
     /* 设置为系统默认字体 */
 	GuiFontSet(&defaultFont);
-  GuiSetbackcolor(0);
-  GuiSetForecolor(1);
+  GuiSetbackcolor(CWHITLE);
+  GuiSetForecolor(CBLACK);
 }

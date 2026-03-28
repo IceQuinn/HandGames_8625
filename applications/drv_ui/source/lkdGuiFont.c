@@ -1,5 +1,12 @@
-#include "draw_gui_font.h"
+/**
+  * @file   lkdGuiFont.c
+  * @author  guoweilkd
+  * @version V1.1.0
+  * @date    2018/03/27
+  * @brief  gwGui字体文件
+  */
 
+#include "lkdGui.h"
 
 /* lkd字体 */
 lkdFont *thisFont;
@@ -14,6 +21,15 @@ void GuiFontSet(lkdFont *pFont)
 	thisFont = pFont;
 }
 
+/**
+  *@brief  获取当前字体
+  *@param  None
+  *@retval 当前字体指针
+  */
+lkdFont *GetCurrentFont(void)
+{
+	return thisFont;
+}
 
 /**
   *@brief  写文本
@@ -68,18 +84,18 @@ void GuiText(fontTextInfo *tInfo, uint8_t *str)
   */
 uint16_t GetTextPixLen(uint8_t *str)
 {
-    uint16_t len = 0;
-    while(*str != '\0'){
-        if(*str > 0x7f){
-            len += thisFont->dwide;
-            str += 2;
-        }
-        else{
-            len += thisFont->swide;
-            str ++;
-        }
-    }
-    return len;
+	uint16_t len = 0;
+	while(*str != '\0'){
+		if(*str > 0x7f){
+			len += thisFont->dwide;
+			str += 2;
+		}
+		else{
+			len += thisFont->swide;
+			str ++;
+		}
+	}
+	return len;
 }
 
 /**
@@ -119,7 +135,7 @@ void GuiRowText(uint16_t x, uint16_t y,uint16_t wide, FontFlag flag,uint8_t *str
 	tInfo.y = y;
 	tInfo.wide = wide;
 	tInfo.high = thisFont->dhigh;
-	if(backcolor == 0){
+	if(backcolor == CWHITLE){
 		tInfo.flag = 0;
 	}
 	else{//反显
@@ -127,3 +143,14 @@ void GuiRowText(uint16_t x, uint16_t y,uint16_t wide, FontFlag flag,uint8_t *str
 	}
 	GuiText(&tInfo, str);
 }
+
+void GuiFont12Align(uint16_t x, uint16_t y,uint16_t wide, FontFlag flag,uint8_t *str)
+{
+	GuiRowText(x, y,wide,flag,str);
+}
+
+void GuiFont12(uint16_t x, uint16_t y, uint8_t *str)
+{
+	GuiRowText(x, y,159,FONT_LEFT,str);
+}
+/* END */

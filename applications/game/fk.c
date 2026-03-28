@@ -11,7 +11,8 @@
 #include "drv_common.h"
 #include <stdint.h>
 
-#include "draw_gui_font.h"
+//#include "draw_gui_font.h"
+#include "lkdGui.h"
 
 
 // 地图数组
@@ -195,7 +196,7 @@ struct Size_Str
 {
     uint16_t x;         // 窗口左上角x坐标
     uint16_t y;         // 窗口左上角y坐标
-    uint16_t width;     // 窗口宽度 
+    uint16_t width;     // 窗口宽度
     uint16_t height;    // 窗口高度
 };
 
@@ -482,7 +483,7 @@ uint16_t ClearLines(void)
     return ClearedLines;
 }
 
-
+// 初始化背景点
 void Init_Back_Point(void)
 {
     for(uint16_t x=0; x<100; ){
@@ -695,7 +696,7 @@ void thread_fk(void)
         err_t = rt_event_recv(&Tetris_event,
                 (TETRIS_MOVE_LEFT|TETRIS_MOVE_RIGHT|TETRIS_ROTATE|TETRIS_DROP_FAST),
                 RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
-                500,
+                700,
                 &Tetris_e_flg);
 
         if(-RT_ETIMEOUT == err_t){
