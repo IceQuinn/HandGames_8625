@@ -32,7 +32,7 @@ void GuiWinDraw(lkdWin *pWindow)
 	GuiRect(pWindow->x, pWindow->y, pWindow->x + pWindow->wide - 1,\
 		pWindow->y + pWindow->hight - 1, forecolor);
 	if(pWindow->title != NULL){
-		GuiHLine(pWindow->x, pWindow->y + 15,pWindow->x + pWindow->wide - 1, forecolor);
+		GuiHLine(pWindow->x, pWindow->y + 16,pWindow->x + pWindow->wide - 1, forecolor);
 		GuiRowText(pWindow->x + 2, pWindow->y + 2, pWindow->wide - 4,\
 			FONT_MID,pWindow->title);
 	}

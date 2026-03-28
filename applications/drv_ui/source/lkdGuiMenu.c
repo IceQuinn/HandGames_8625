@@ -189,7 +189,7 @@ static void DrawNodes(lkdMenu *pM,lkdMenuNode *pthisNode,uint16_t x,\
 			GuiExchangeColor();
 		}
 		else{
-			GuiRowText(x + 2,beginy + 2 + i*pM->Itemshigh,pM->ItemsWide - 3,FONT_LEFT,pthisNode->name);
+			GuiRowText(x + 2,beginy + 1 + i*pM->Itemshigh,pM->ItemsWide - 3,FONT_LEFT,pthisNode->name);
 			if(pthisNode->pSon != NULL){
 				GuiRowText(x + pM->ItemsWide - 8,beginy + 2 + i*pM->Itemshigh,6,FONT_LEFT,(uint8_t *)">");
 			}

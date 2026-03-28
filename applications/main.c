@@ -25,6 +25,7 @@
 
 //#include "draw_gui_font.h"
 #include "ui.h"
+#include "Main_Menu.h"
 
 
 #define countof(x)      (sizeof(x)/sizeof(x[0]))
@@ -41,13 +42,15 @@ typedef struct
 }user_thread_table_typedef;
 
 const user_thread_table_typedef user_thread_table[] = {
-        {"measure",     thread_fk,  RT_NULL,    1024,   17, 15},    /* 计量线程 */
-        {"meas_data",   button_therad,     RT_NULL,    1024,   22, 15},    /* 测量数据线程 */
+        // {"measure",     thread_fk,  RT_NULL,    1024,   17, 15},    /* 计量线程 */
+        // {"meas_data",   button_therad,     RT_NULL,    1024,   22, 15},    /* 测量数据线程 */
 //
 //        {"record",      Record_Wave_Thread, RT_NULL,    1024,   6,  15},    /* 录波线程 */
 //        {"event",       Event_Deal_Loop,    RT_NULL,    1024,   30, 10},    /* 事件记录线程 */
 //        {"btn",         btn_thread_entry,   RT_NULL,    768,    9,  10},    /* 按键线程 */
-       {"ui",          ui_thread,            RT_NULL,    2048,   26, 10},    /* 显示线程 */
+        // {"ui",          ui_thread,            RT_NULL,    2048,   26, 10},    /* 显示线程 */
+        {"menu",          Main_menu_Thread,            RT_NULL,    2048,   26, 10},    /* 显示线程 */
+       
 
 //        {"relay",       relay_thread_entry, RT_NULL,    768,    8, 10},    /* 保护+交流量计算线程 */
 //        {"md_send",     send_thread_entry,  RT_NULL,    1280,   29, 10},    /* 转存数据线程 */
@@ -88,32 +91,32 @@ int main(void)
     // for (int var = 0; var < 160; ++var) {
     //     GuiDrawPoint(var, var, 1);
     // }
-    for (int var = 0; var < 160; ++var) {
-        GuiDrawPoint(var, 0, 1);
-    }
-    for (int var = 0; var < 160; ++var) {
-        GuiDrawPoint(0, var, 1);
-    }
+    // for (int var = 0; var < 160; ++var) {
+    //     GuiDrawPoint(var, 0, 1);
+    // }
+    // for (int var = 0; var < 160; ++var) {
+    //     GuiDrawPoint(0, var, 1);
+    // }
 
-    for (int var = 0; var < 160; ++var) {
-        GuiDrawPoint(var, 159, 1);
-    }
-    for (int var = 0; var < 160; ++var) {
-        GuiDrawPoint(159, var, 1);
-    }
+    // for (int var = 0; var < 160; ++var) {
+    //     GuiDrawPoint(var, 159, 1);
+    // }
+    // for (int var = 0; var < 160; ++var) {
+    //     GuiDrawPoint(159, var, 1);
+    // }
 
-    GuiHPointLine(0, 8, 159, 1, 1);
-    GuiRPointLine(101, 0, 159, 1, 1);
+    // GuiHPointLine(0, 8, 159, 1, 1);
+    // GuiRPointLine(101, 0, 159, 1, 1);
 
     // defaultFontInit();
-    userAppPortInit();
+    // userAppPortInit();
 
 //    GuiRowText(130, 20, 32, FONT_LEFT, "菜单");
 
 
     // GuiUpdateDisplayAll();
 
-    // user_thread_init();
+    user_thread_init();
 
 //    thread_fk();
 
