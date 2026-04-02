@@ -43,7 +43,7 @@ typedef struct
 
 const user_thread_table_typedef user_thread_table[] = {
         // {"measure",     thread_fk,  RT_NULL,    1024,   17, 15},    /* 计量线程 */
-        // {"meas_data",   button_therad,     RT_NULL,    1024,   22, 15},    /* 测量数据线程 */
+        {"meas_data",   button_therad,     RT_NULL,    1024,   22, 15},    /* 测量数据线程 */
 //
 //        {"record",      Record_Wave_Thread, RT_NULL,    1024,   6,  15},    /* 录波线程 */
 //        {"event",       Event_Deal_Loop,    RT_NULL,    1024,   30, 10},    /* 事件记录线程 */
@@ -88,6 +88,10 @@ int main(void)
 {
     UC1698u_Init();
 
+    rt_pin_mode(GET_PIN(A, 15), PIN_MODE_OUTPUT);
+
+    rt_pin_write(GET_PIN(A, 15), PIN_LOW);
+    
     // for (int var = 0; var < 160; ++var) {
     //     GuiDrawPoint(var, var, 1);
     // }

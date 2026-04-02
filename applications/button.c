@@ -132,6 +132,11 @@ KeyEvent Key_Scan(uint8_t id)
     return KEY_EVENT_NONE;
 }
 
+extern void MenuLeft(void);
+extern void MenuRight(void);
+extern void MenuEsc(void);
+extern void MenuConfirm(void);
+
 
 
 void Key_Task(void)
@@ -145,19 +150,23 @@ void Key_Task(void)
             switch(i)
             {
                 case KEY_LEFT:
-                    MoveLeft();
+                    // MoveLeft();
+                    MenuLeft();
                     break;
 
                 case KEY_RIGHT:
-                    MoveRight();
+                    // MoveRight();
+                    MenuRight();
                     break;
 
                 case KEY_ROTATE:
-                    Rotate();
+                    // Rotate();
+                    MenuEsc();
                     break;
 
                 case KEY_DROP:
-                    DropFast();
+                    // DropFast();
+                    MenuConfirm();
                     break;
             }
         }

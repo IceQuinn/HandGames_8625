@@ -176,36 +176,42 @@ static void DrawNodes(lkdMenu *pM,lkdMenuNode *pthisNode,uint16_t x,\
 			pthisNode = pthisNode->pBro;
 		}
 	}
-	GuiFillRect(x,beginy,x + pM->ItemsWide - 1,beginy + cNum*pM->Itemshigh, backcolor);
+//	GuiFillRect(x,beginy,x + pM->ItemsWide - 1,beginy + cNum*pM->Itemshigh, backcolor);
+	GuiFillRect(x,beginy,x + pM->ItemsWide, beginy + cNum*pM->Itemshigh, backcolor);
 	for(uint8_t i = 0; i < cNum; i ++){
 		if(indexOffset + i == index){
-			GuiFillRect(x + 1,beginy + 1 + i*pM->Itemshigh,\
-				x + pM->ItemsWide - 1, beginy + (i+1)*pM->Itemshigh - 1, forecolor);
+//			GuiFillRect(x + 1,beginy + 1 + i*pM->Itemshigh,\
+//				x + pM->ItemsWide - 1, beginy + (i+1)*pM->Itemshigh - 1, forecolor);
+            GuiFillRect(x, beginy + i*pM->Itemshigh,\
+                x + pM->ItemsWide - 1, beginy + (i+1)*pM->Itemshigh - 1, forecolor);
 			GuiExchangeColor();
-			GuiRowText(x + 2,beginy + 2 + i*pM->Itemshigh,pM->ItemsWide - 3,FONT_LEFT,pthisNode->name);
+//			GuiRowText(x + 2,beginy + 2 + i*pM->Itemshigh,pM->ItemsWide - 3,FONT_LEFT,pthisNode->name);
+			GuiRowText(x, beginy + i*pM->Itemshigh, pM->ItemsWide - 8 ,FONT_LEFT, pthisNode->name);
 			if(pthisNode->pSon != NULL){
-				GuiRowText(x + pM->ItemsWide - 8,beginy + 2 + i*pM->Itemshigh,6,FONT_LEFT,(uint8_t *)">");
+//				GuiRowText(x + pM->ItemsWide - 8, beginy + 2 + i*pM->Itemshigh,6,FONT_LEFT,(uint8_t *)">");
+			    GuiRowText(x + pM->ItemsWide - 8, beginy + 0 + i*pM->Itemshigh, 8, FONT_LEFT,(uint8_t *)">");
 			}
 			GuiExchangeColor();
 		}
 		else{
-			GuiRowText(x + 2,beginy + 1 + i*pM->Itemshigh,pM->ItemsWide - 3,FONT_LEFT,pthisNode->name);
+//			GuiRowText(x + 2,beginy + 1 + i*pM->Itemshigh,pM->ItemsWide - 3,FONT_LEFT,pthisNode->name);
+		    GuiRowText(x, beginy + i*pM->Itemshigh, pM->ItemsWide - 8, FONT_LEFT, pthisNode->name);
 			if(pthisNode->pSon != NULL){
-				GuiRowText(x + pM->ItemsWide - 8,beginy + 2 + i*pM->Itemshigh,6,FONT_LEFT,(uint8_t *)">");
+			    GuiRowText(x + pM->ItemsWide - 8, beginy + 0 + i*pM->Itemshigh, 8, FONT_LEFT,(uint8_t *)">");
 			}
 		}
-		GuiHLine(x + 1,beginy + (i+1)*pM->Itemshigh,x + pM->ItemsWide - 1, forecolor);
+//		GuiHLine(x + 1,beginy + (i+1)*pM->Itemshigh,x + pM->ItemsWide - 1, forecolor);
 		pthisNode = pthisNode->pBro;
 	}
-	GuiHLine(x + 1,beginy,x + pM->ItemsWide - 1, forecolor);
-	if(beginy + cNum*pM->Itemshigh + 1 <= pM->y + pM->hight - 1){
-		GuiHLine(x + 1,beginy + cNum*pM->Itemshigh + 1,x + pM->ItemsWide - 1, forecolor);
-	}
-	GuiRLine(x, beginy,beginy + cNum*pM->Itemshigh + 1, forecolor);
-	GuiRLine(x + pM->ItemsWide, beginy,beginy + cNum*pM->Itemshigh + 1, forecolor);
-	if(pM->x + pM->wide > x + pM->ItemsWide){
-		GuiRLine(x + pM->ItemsWide + 1, beginy,beginy + cNum*pM->Itemshigh + 1, forecolor);
-	}
+//	GuiHLine(x + 1,beginy,x + pM->ItemsWide - 1, forecolor);
+//	if(beginy + cNum*pM->Itemshigh + 1 <= pM->y + pM->hight - 1){
+//		GuiHLine(x + 1,beginy + cNum*pM->Itemshigh + 1,x + pM->ItemsWide - 1, forecolor);
+//	}
+//	GuiRLine(x, beginy,beginy + cNum*pM->Itemshigh + 1, forecolor);
+//	GuiRLine(x + pM->ItemsWide, beginy,beginy + cNum*pM->Itemshigh + 1, forecolor);
+//	if(pM->x + pM->wide > x + pM->ItemsWide){
+//		GuiRLine(x + pM->ItemsWide + 1, beginy,beginy + cNum*pM->Itemshigh + 1, forecolor);
+//	}
 }
 
 /**
