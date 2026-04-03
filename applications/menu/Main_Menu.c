@@ -88,20 +88,6 @@ void Main_Menu_Init2(void)
 	GuiMenuInit(&root);
 	//展开当前选中节点
 	GuiMenuCurrentNodeSonUnfold(&root);
-	
-	
-	GuiUpdateDisplayAll();/* 更新 */
-    rt_thread_mdelay(2000);
-
-    GuiMenuCurrentNodeSonUnfold(&root);
-    GuiUpdateDisplayAll();/* 更新 */
-    rt_thread_mdelay(2000);
-
-
-    GuiMenuItemDownMove(&root);//选中下移
-    GuiUpdateDisplayAll();/* 更新 */
-    rt_thread_mdelay(2000);
-
 }
 union Menu_e_flg_UNION
 {

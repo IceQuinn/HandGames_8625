@@ -363,9 +363,12 @@ static uint8_t GuiMenuNodesDisplay(lkdMenu *pM,lkdMenuNode *node)
   */
 uint8_t GuiMenuCurrentNodeHide(lkdMenu *pM)
 {
-	if(pM->count >= 1){
+	if(pM->count > 1){
 		pM->count --;
 	}
+	else {
+	    return 1;
+    }
 	if(pM->count < pM->stackNum){//ÅĞ¶ÏÕ»ÊÇ·ñÎª¿Õ
 		RedrawMenu(pM);
 		pM->index = pM->stack[pM->count].index;
