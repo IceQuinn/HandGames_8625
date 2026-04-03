@@ -61,9 +61,9 @@ lkdMenuNode Node2_2 = {5, "no1-2", &Node3_3, NULL,NULL };     // 信息
 lkdMenuNode Node1_1 = {4, "no1-1", &Node2_2, NULL,NULL };  // 参数设置
 
 //3. 定义一级菜单
-lkdMenuNode Node3 = {3, "no3", NULL, NULL,NULL };     // 信息
-lkdMenuNode Node2 = {2, "no2", &Node3, NULL,NULL };     // 信息
-lkdMenuNode Node1 = {1, "no1", &Node2, &Node1_1,NULL };  // 参数设置
+lkdMenuNode Node3 = {3, "信息", NULL, NULL,NULL };     // 信息
+lkdMenuNode Node2 = {2, "通信", &Node3, NULL,NULL };     // 信息
+lkdMenuNode Node1 = {1, "游戏", &Node2, &Node1_1,NULL };  // 参数设置
 
 //3. 定义根菜单
 lkdMenuNode NodeRoot0 = {0, "root", NULL, &Node1, NULL};

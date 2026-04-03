@@ -88,9 +88,9 @@ int main(void)
 {
     UC1698u_Init();
 
-    rt_pin_mode(GET_PIN(A, 15), PIN_MODE_OUTPUT);
+    // rt_pin_mode(GET_PIN(A, 15), PIN_MODE_OUTPUT);
 
-    rt_pin_write(GET_PIN(A, 15), PIN_LOW);
+    // rt_pin_write(GET_PIN(A, 15), PIN_LOW);
     
     // for (int var = 0; var < 160; ++var) {
     //     GuiDrawPoint(var, var, 1);
