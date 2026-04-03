@@ -1,7 +1,7 @@
 #include "Main_Menu.h"
 #include "lkdGui.h"
 #include "drv_common.h"
-
+#include "button.h"
 
 
 
@@ -55,10 +55,14 @@ void Main_Menu_Init(void)
 #define MENUSTACK_NUM 8
 MenuStack userMenuStack[MENUSTACK_NUM];
 
+
+
+extern void Wait_Tetris_Exit(void);
+
 //2. 定义二级菜单
 lkdMenuNode Node3_3 = {6, "no1-3", NULL, NULL,NULL };     // 信息
 lkdMenuNode Node2_2 = {5, "no1-2", &Node3_3, NULL,NULL };     // 信息
-lkdMenuNode Node1_1 = {4, "no1-1", &Node2_2, NULL,NULL };  // 参数设置
+lkdMenuNode Node1_1 = {4, "俄罗斯方块", &Node2_2, NULL,Wait_Tetris_Exit };  // 参数设置
 
 //3. 定义一级菜单
 lkdMenuNode Node3 = {3, "信息", NULL, NULL,NULL };     // 信息
@@ -79,7 +83,7 @@ lkdMenu root={
     .index=1,//默认选中节点
     .stackNum=MENUSTACK_NUM,
     .stack = userMenuStack,
-     .Root = &NodeRoot0
+    .Root = &NodeRoot0
 };
 
 void Main_Menu_Init2(void)
@@ -176,23 +180,20 @@ void Main_menu_Thread(void *param)
 
     int32_t err_t = RT_EOK;
     /* 初始化事件对象 */
-    if(RT_EOK != rt_event_init(&Menu_event, "Menu_event", RT_IPC_FLAG_PRIO))
-    {
-        rt_kprintf("init Menu_event failed.\n");
-    }
+    // if(RT_EOK != rt_event_init(&Menu_event, "Menu_event", RT_IPC_FLAG_PRIO))
+    // {
+    //     rt_kprintf("init Menu_event failed.\n");
+    // }
 
     Main_Menu_Init2();
     while(1)
     {
-        err_t = rt_event_recv(&Menu_event,
-                (MENU_MOVE_LEFT|MENU_MOVE_RIGHT|MENU_ESC|MENU_CONFIRM),
-                RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
-                700,
-                &Menu_e_flg);
-
-        if(-RT_ETIMEOUT == err_t){
-            Menu_e_flg.Menu_timeout = 1;
-        }
+        // err_t = rt_event_recv(&Menu_event,
+        //         (MENU_MOVE_LEFT|MENU_MOVE_RIGHT|MENU_ESC|MENU_CONFIRM),
+        //         RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
+        //         700,
+        //         &Menu_e_flg);
+        Menu_e_flg.Menu_e_flg = Btn_Event_Wait(RT_WAITING_FOREVER);
 
         Main_Menu_Task(&Menu_e_flg);
         Menu_e_flg.Menu_e_flg = 0;

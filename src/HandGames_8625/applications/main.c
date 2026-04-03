@@ -42,7 +42,7 @@ typedef struct
 }user_thread_table_typedef;
 
 const user_thread_table_typedef user_thread_table[] = {
-        // {"measure",     thread_fk,  RT_NULL,    1024,   17, 15},    /* 计量线程 */
+         {"measure",     thread_fk,  RT_NULL,    1024,   17, 15},    /* 计量线程 */
         {"meas_data",   button_therad,     RT_NULL,    1024,   22, 15},    /* 测量数据线程 */
 //
 //        {"record",      Record_Wave_Thread, RT_NULL,    1024,   6,  15},    /* 录波线程 */

@@ -395,6 +395,11 @@ uint8_t GuiMenuCurrentNodeSonUnfold(lkdMenu *pM)
 		GuiUpdateDisplayAll();
 		return 0;
 	}
+	else if(thisNode != NULL && thisNode->pSon == NULL && thisNode->user != NULL){
+	    //
+	    void (*pUser)(void) = thisNode->user;
+	    pUser();
+    }
 	return 1;
 }
 

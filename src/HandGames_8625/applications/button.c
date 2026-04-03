@@ -132,11 +132,27 @@ KeyEvent Key_Scan(uint8_t id)
     return KEY_EVENT_NONE;
 }
 
-extern void MenuLeft(void);
-extern void MenuRight(void);
-extern void MenuEsc(void);
-extern void MenuConfirm(void);
+/* 事件控制块 */
+static struct rt_event Btn_event;
 
+union Btn_e_flg_UNION
+{
+    uint32_t Btn_e_flg;
+    struct {
+        uint32_t Btn_move_left       :1;     // 左移
+        uint32_t Btn_move_right      :1;     // 右移
+        uint32_t Btn_esc             :1;     // 返回
+        uint32_t Btn_confirm         :1;     // 确定
+        uint32_t Btn_timeout         :1;     // 超时
+    };
+};
+
+
+
+#define BTN_MOVE_LEFT    (1 << 0)  // 左移//
+#define BTN_MOVE_RIGHT   (1 << 1)
+#define BTN_ESC          (1 << 2)
+#define BTN_CONFIRM      (1 << 3)
 
 
 void Key_Task(void)
@@ -151,22 +167,26 @@ void Key_Task(void)
             {
                 case KEY_LEFT:
                     // MoveLeft();
-                    MenuLeft();
+                    // MenuLeft();
+                    rt_event_send(&Btn_event, BTN_MOVE_LEFT);
                     break;
 
                 case KEY_RIGHT:
                     // MoveRight();
-                    MenuRight();
+                    // MenuRight();
+                    rt_event_send(&Btn_event, BTN_MOVE_RIGHT);
                     break;
 
                 case KEY_ROTATE:
                     // Rotate();
-                    MenuEsc();
+                    // MenuEsc();
+                    rt_event_send(&Btn_event, BTN_ESC);
                     break;
 
                 case KEY_DROP:
                     // DropFast();
-                    MenuConfirm();
+                    // MenuConfirm();
+                    rt_event_send(&Btn_event, BTN_CONFIRM);
                     break;
             }
         }
@@ -183,8 +203,32 @@ void btn_gpio_init(void)
 }
 
 
+
+uint32_t Btn_Event_Wait(int32_t timeout)
+{
+    union Btn_e_flg_UNION Btn_e_flg = {.Btn_e_flg = 0};
+    int32_t err_t = RT_EOK;
+
+    err_t = rt_event_recv(&Btn_event,
+            (BTN_MOVE_LEFT|BTN_MOVE_RIGHT|BTN_ESC|BTN_CONFIRM),
+            RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
+            timeout,
+            &Btn_e_flg);
+    if(-RT_ETIMEOUT == err_t){
+        Btn_e_flg.Btn_timeout = 1;
+    }
+    return Btn_e_flg.Btn_e_flg;
+}
+
+
 void button_therad(void)
 {
+    int32_t err_t = RT_EOK;
+    /* 初始化事件对象 */
+    if(RT_EOK != rt_event_init(&Btn_event, "Btn_event", RT_IPC_FLAG_PRIO))
+    {
+        rt_kprintf("init Btn_event failed.\n");
+    }
     btn_gpio_init();
     while(1)
     {

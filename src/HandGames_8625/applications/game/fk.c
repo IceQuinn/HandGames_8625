@@ -13,6 +13,7 @@
 
 //#include "draw_gui_font.h"
 #include "lkdGui.h"
+#include "button.h"
 
 
 // 地图数组
@@ -598,16 +599,17 @@ void TetrisTask(union Tetris_e_flg_UNION *flag, struct Tetris_Window_Str *p_Tetr
         }
     }
     static uint32_t tick_timeout = 0;
+    static uint32_t Tetris_timeout_flg = 0;
     if(0 == tick_timeout){
         tick_timeout = rt_tick_get();
     }
     else {
         if((rt_tick_get() - tick_timeout) > 500){
-            flag->Tetris_timeout = 1;
+            Tetris_timeout_flg = 1;
             tick_timeout = rt_tick_get();
         }
     }
-    if(flag->Tetris_timeout){
+    if(Tetris_timeout_flg){
 
         // 方块下落时，的碰撞检测（下落一格）
         if(!CheckCollision(p_Tetris_W->Game_W.Curr_Cube.x, p_Tetris_W->Game_W.Curr_Cube.y+BLOCK_SIZE, p_Tetris_W->Game_W.Curr_Cube.type, p_Tetris_W->Game_W.Curr_Cube.rot))
@@ -630,9 +632,13 @@ void TetrisTask(union Tetris_e_flg_UNION *flag, struct Tetris_Window_Str *p_Tetr
                 p_Tetris_W->Text_W.Score = 0;
             }
         }
+        Tetris_timeout_flg = 0;
     }
     DrawMap();
     DrawCurrent(1, &p_Tetris_W->Game_W);
+    if(flag->Tetris_timeout){
+        GuiUpdateDisplayAll();
+    }
 }
 
 
@@ -678,6 +684,14 @@ void DropFast(void)
     rt_event_send(&Tetris_event, TETRIS_DROP_FAST);
 }
 
+struct rt_semaphore tetris_sem;            //tetris线程信号量
+struct rt_semaphore tetris_sem2;            //tetris线程信号量2
+void Wait_Tetris_Exit(void)
+{
+    rt_kprintf("go to  Tetris\n");
+    rt_sem_release(&tetris_sem2);
+    rt_sem_take(&tetris_sem, RT_WAITING_FOREVER);
+}
 
 
 
@@ -690,23 +704,30 @@ void thread_fk(void)
         rt_kprintf("init event failed.\n");
     }
 
-    TetrisInit();
-    while(1)
+    if(rt_sem_init(&tetris_sem, "tetris_sem", 0, RT_IPC_FLAG_FIFO) != RT_EOK)
     {
-        err_t = rt_event_recv(&Tetris_event,
-                (TETRIS_MOVE_LEFT|TETRIS_MOVE_RIGHT|TETRIS_ROTATE|TETRIS_DROP_FAST),
-                RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
-                700,
-                &Tetris_e_flg);
+        rt_kprintf("creat sem tetris_sem failed!\n");
+    }
+    if(rt_sem_init(&tetris_sem2, "tetris_sem2", 0, RT_IPC_FLAG_FIFO) != RT_EOK)
+    {
+        rt_kprintf("creat sem tetris_sem2 failed!\n");
+    }
 
-        if(-RT_ETIMEOUT == err_t){
-            Tetris_e_flg.Tetris_timeout = 1;
+    TetrisInit();
+    while(rt_sem_take(&tetris_sem2, RT_WAITING_FOREVER) == RT_EOK)
+    {
+        // err_t = rt_event_recv(&Tetris_event,
+        //         (TETRIS_MOVE_LEFT|TETRIS_MOVE_RIGHT|TETRIS_ROTATE|TETRIS_DROP_FAST),
+        //         RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
+        //         700,
+        //         &Tetris_e_flg);
+        while (1)
+        {
+            Tetris_e_flg.Tetris_e_flg = Btn_Event_Wait(100);
+
+            TetrisTask(&Tetris_e_flg, &Tetris_W);
+            Tetris_e_flg.Tetris_e_flg = 0;
         }
-
-        TetrisTask(&Tetris_e_flg, &Tetris_W);
-        Tetris_e_flg.Tetris_e_flg = 0;
-        // GuiUpdateDisplayAll();
-//        rt_thread_mdelay(500);
     }
 
 }

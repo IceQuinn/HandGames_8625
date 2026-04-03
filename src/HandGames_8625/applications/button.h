@@ -10,6 +10,10 @@
 #ifndef APPLICATIONS_BUTTON_H_
 #define APPLICATIONS_BUTTON_H_
 
+#include <stdint.h>
+
 void button_therad(void);
+
+uint32_t Btn_Event_Wait(int32_t timeout);
 
 #endif /* APPLICATIONS_BUTTON_H_ */
